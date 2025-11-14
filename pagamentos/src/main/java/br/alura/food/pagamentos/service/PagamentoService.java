@@ -4,13 +4,16 @@ import br.alura.food.pagamentos.domain.Pagamento;
 import br.alura.food.pagamentos.domain.Status;
 import br.alura.food.pagamentos.dto.PagamentoRequestDto;
 import br.alura.food.pagamentos.dto.PagamentoResponseDto;
+import br.alura.food.pagamentos.http.PedidoClient;
 import br.alura.food.pagamentos.mapper.PagamentoMapper;
 import br.alura.food.pagamentos.repository.PagamentoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import javax.persistence.EntityNotFoundException;
+import java.util.Optional;
 
 @Service
 public class PagamentoService {
@@ -20,6 +23,8 @@ public class PagamentoService {
 
     @Autowired
     private PagamentoMapper mapper;
+    @Autowired
+    private PedidoClient pedido;
 
     public Page<PagamentoResponseDto> obterTodos(Pageable paginacao) {
         return repository.findAll(paginacao)
@@ -40,6 +45,17 @@ public class PagamentoService {
 
         return mapper.toDTO(pagamento);
     }
+    public void confirmarPagamento(Long id){
+        Optional<Pagamento> pagamento = repository.findById(id);
+
+        if (!pagamento.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        pagamento.get().setStatus(Status.CONFIRMADO);
+        repository.save(pagamento.get());
+        pedido.atualizaPagamento(pagamento.get().getPedidoId());
+    }
 
     public PagamentoResponseDto atualizarPagamento(Long id, PagamentoRequestDto dto) {
         Pagamento pagamento = mapper.toEntity(dto);
@@ -53,4 +69,14 @@ public class PagamentoService {
     }
 
 
+    public void alteraStatus(Long id) {
+        Optional<Pagamento> pagamento = repository.findById(id);
+
+        if (!pagamento.isPresent()) {
+            throw new EntityNotFoundException();
+        }
+
+        pagamento.get().setStatus(Status.CONFIRMADO_SEM_INTEGRACAO);
+        repository.save(pagamento.get());
+    }
 }

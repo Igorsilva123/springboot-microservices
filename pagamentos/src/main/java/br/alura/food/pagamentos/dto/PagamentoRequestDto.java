@@ -1,13 +1,11 @@
 package br.alura.food.pagamentos.dto;
 
-import br.alura.food.pagamentos.domain.Status;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 
+import org.jetbrains.annotations.NotNull;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 public record PagamentoRequestDto(
